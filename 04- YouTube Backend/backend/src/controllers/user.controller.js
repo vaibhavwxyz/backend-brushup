@@ -127,9 +127,15 @@ const loginUser = asyncHandler(async (req, res) => {
     user._id
   );
 
-  const loggedInUser = User.findById(user._id).select(
+  const loggedInUserDocument = await User.findById(user._id).select(
     "-password -refreshToken"
   );
+
+  if (!loggedInUserDocument) {
+    throw new ApiError(500, "Failed to find logged-in user");
+  }
+
+  const loggedInUser = loggedInUserDocument.toObject();
 
   const options = {
     httpOnly: true,
